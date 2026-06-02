@@ -481,7 +481,7 @@ giftScreen.addEventListener('pointerdown',safeReveal);
 // En móvil: cuenta regresiva y auto-reveal
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
 if (isMobile) {
-  let countdown = 3;
+  let countdown = 10;
   const hint = document.querySelector('.click-hint');
   hint.textContent = `¡Toca! (${countdown})`;
   const timer = setInterval(() => {
