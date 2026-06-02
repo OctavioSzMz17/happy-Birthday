@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday my Love 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: #0a0010;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* ── STARS BACKGROUND ── */
+  #stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── FIREWORKS CANVAS ── */
+  #fw-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* ── GIFT SCREEN ── */
+  #gift-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+  #gift-screen.fade-out {
+    opacity: 0;
+    transform: scale(1.15);
+    pointer-events: none;
+  }
+
+  .gift-box {
+    font-size: clamp(90px, 28vw, 150px);
+    animation: float 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(255,100,200,0.5)) drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+    transition: transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .gift-box:active { transform: scale(1.1) rotate(-3deg); }
+
+  .click-hint {
+    margin-top: 18px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #ff80c0;
+    text-shadow: 0 0 15px rgba(255,100,200,0.8);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-20px); }
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  /* ── BIRTHDAY SCREEN ── */
+  #birthday-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 1s ease 0.5s;
+  }
+  #birthday-screen.visible { opacity: 1; }
+
+  /* Center card — sin borde ni fondo */
+  .center-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 30px;
+  }
+
+  /* Balloons row */
+  .balloons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .balloon-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .balloon-wrap.pop-in { opacity: 1; transform: translateY(0); }
+
+  .balloon {
+    width: clamp(38px, 9vw, 54px);
+    height: clamp(48px, 11vw, 68px);
+    border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.7rem, 2.5vw, 1.05rem);
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow:
+      inset -6px -6px 14px rgba(0,0,0,0.2),
+      inset 4px 4px 8px rgba(255,255,255,0.35),
+      0 0 18px rgba(255,100,180,0.4);
+    animation: sway 3s ease-in-out infinite;
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    width: 1.5px;
+    height: 20px;
+    background: rgba(255,255,255,0.3);
+  }
+
+  .b1 { background: #f48fb1; animation-delay: 0s; }
+  .b2 { background: #f06292; animation-delay: 0.3s; }
+  .b3 { background: #ec407a; animation-delay: 0.6s; }
+  .b4 { background: #e91e63; animation-delay: 0.9s; }
+  .b5 { background: #c2185b; animation-delay: 1.2s; }
+  .b6 { background: #880e4f; animation-delay: 1.5s; }
+
+  @keyframes sway {
+    0%,100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
+  }
+
+  /* Cake */
+  .cake {
+    font-size: clamp(70px, 22vw, 120px);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.8s ease 0.8s, transform 0.8s cubic-bezier(.34,1.56,.64,1) 0.8s;
+    filter: drop-shadow(0 0 30px rgba(255,150,50,0.5)) drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+  }
+  .cake.pop-in { opacity: 1; transform: scale(1); }
+
+  /* Message */
+  .message {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: #ff9ec8;
+    margin-top: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 1.4s, transform 0.8s ease 1.4s;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(255,100,180,0.7);
+  }
+  .message.pop-in { opacity: 1; transform: translateY(0); }
+
+  .name {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.4rem, 7vw, 3.8rem);
+    color: #ffd4ec;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 1.9s, transform 0.8s ease 1.9s;
+    text-align: center;
+    letter-spacing: 3px;
+    text-shadow: 0 0 30px rgba(255,150,220,0.9), 0 0 60px rgba(255,80,180,0.4);
+  }
+  .name.pop-in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<canvas id="fw-canvas"></canvas>
+
+<!-- GIFT SCREEN -->
+<div id="gift-screen">
+  <div class="gift-box">🎁</div>
+  <p class="click-hint">¡Clic!</p>
+</div>
+
+<!-- BIRTHDAY SCREEN -->
+<div id="birthday-screen">
+  <div class="center-card">
+    <div class="balloons">
+      <div class="balloon-wrap b-wrap" style="transition-delay:0.4s"><div class="balloon b1">❤️</div></div>
+      <div class="balloon-wrap b-wrap" style="transition-delay:0.55s"><div class="balloon b2">L</div></div>
+      <div class="balloon-wrap b-wrap" style="transition-delay:0.7s"><div class="balloon b3">O</div></div>
+      <div class="balloon-wrap b-wrap" style="transition-delay:0.85s"><div class="balloon b4">V</div></div>
+      <div class="balloon-wrap b-wrap" style="transition-delay:1.0s"><div class="balloon b5">E</div></div>
+      <div class="balloon-wrap b-wrap" style="transition-delay:1.15s"><div class="balloon b6">!</div></div>
+    </div>
+    <div class="cake" id="cake">🎂</div>
+    <p class="message" id="message">Happy Birthday my Love</p>
+    <p class="name" id="name">Valentina ✨</p>
+  </div>
+</div>
+
+<script>
+// ── STARS ──
+(function() {
+  const c = document.getElementById('stars');
+  const cx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const stars = Array.from({length:180}, () => ({
+    x: Math.random()*c.width, y: Math.random()*c.height,
+    r: Math.random()*1.4+0.3,
+    a: Math.random(), da: (Math.random()-0.5)*0.008
+  }));
+  function drawStars() {
+    cx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s => {
+      s.a += s.da;
+      if(s.a<=0||s.a>=1) s.da*=-1;
+      cx.beginPath();
+      cx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      cx.fillStyle = `rgba(255,255,255,${s.a})`;
+      cx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+  window.addEventListener('resize',()=>{ c.width=window.innerWidth; c.height=window.innerHeight; });
+})();
+
+// ── FIREWORKS ──
+const fw = document.getElementById('fw-canvas');
+const fwCtx = fw.getContext('2d');
+fw.width = window.innerWidth; fw.height = window.innerHeight;
+window.addEventListener('resize',()=>{ fw.width=window.innerWidth; fw.height=window.innerHeight; });
+
+let fireworksActive = false;
+
+// Center zone (protected area — no fireworks spawn here)
+function getCenterRect() {
+  const card = document.querySelector('.center-card');
+  if (!card) return null;
+  const r = card.getBoundingClientRect();
+  const pad = 80;
+  return { x: r.left-pad, y: r.top-pad, w: r.width+pad*2, h: r.height+pad*2 };
+}
+
+function randColor() {
+  const palettes = [
+    ['#ff9ec8','#ffcce5','#ff4da6','#ff80c0'],
+    ['#ffd700','#ffe066','#ffaa00','#fff0a0'],
+    ['#a0f0ff','#60d0ff','#00aaff','#e0f8ff'],
+    ['#c8a0ff','#e0c0ff','#9040ff','#f0d8ff'],
+    ['#ff6040','#ff9060','#ff3010','#ffc0a0'],
+    ['#60ffb0','#a0ffd0','#00e070','#d0fff0'],
+  ];
+  const p = palettes[Math.floor(Math.random()*palettes.length)];
+  return p[Math.floor(Math.random()*p.length)];
+}
+
+class Spark {
+  constructor(x, y, vx, vy, color, life, tail) {
+    this.x=x; this.y=y; this.vx=vx; this.vy=vy;
+    this.color=color; this.life=life; this.maxLife=life;
+    this.tail=tail||[];
+    this.gravity=0.06;
+  }
+  update() {
+    this.tail.unshift({x:this.x, y:this.y});
+    if(this.tail.length>12) this.tail.pop();
+    this.vx*=0.98;
+    this.vy=this.vy*0.98+this.gravity;
+    this.x+=this.vx; this.y+=this.vy;
+    this.life--;
+  }
+  draw(ctx) {
+    const alpha = this.life/this.maxLife;
+    // tail
+    for(let i=0;i<this.tail.length;i++){
+      const ta = alpha*(1-i/this.tail.length)*0.6;
+      ctx.beginPath();
+      ctx.arc(this.tail[i].x, this.tail[i].y, Math.max(0.3,(1-i/this.tail.length)*1.5),0,Math.PI*2);
+      ctx.fillStyle = this.color.replace(')',`,${ta})`).replace('rgb(','rgba(').replace('#','');
+      // simpler:
+      ctx.globalAlpha = ta;
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+    // head
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,2,0,Math.PI*2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  dead(){ return this.life<=0; }
+}
+
+class Shell {
+  constructor(x, targetY) {
+    this.x=x; this.y=fw.height+10;
+    this.targetY=targetY;
+    // Speed based on distance so it doesn't fly too slow or too fast
+    const dist = fw.height - targetY;
+    this.vy = -Math.sqrt(2 * 0.04 * dist) * 1.05;
+    this.color=randColor();
+    this.trail=[];
+    this.exploded=false;
+    this.sparks=[];
+    this.type=Math.floor(Math.random()*4);
+  }
+  update() {
+    if(!this.exploded){
+      this.trail.unshift({x:this.x,y:this.y});
+      if(this.trail.length>18) this.trail.pop();
+      this.vy+=0.04;
+      this.y+=this.vy;
+      if(this.vy>=0) this.explode();
+    } else {
+      this.sparks = this.sparks.filter(s=>!s.dead());
+      this.sparks.forEach(s=>s.update());
+    }
+  }
+  explode() {
+    this.exploded=true;
+    const count = 80+Math.floor(Math.random()*80);
+    const vel = 5+Math.random()*5;
+    for(let i=0;i<count;i++){
+      let vx, vy;
+      if(this.type===0){ // perfect circle
+        const a=(i/count)*Math.PI*2;
+        vx=Math.cos(a)*vel*(0.9+Math.random()*0.2);
+        vy=Math.sin(a)*vel*(0.9+Math.random()*0.2);
+      } else if(this.type===1){ // chrysanthemum — layered
+        const a=(i/count)*Math.PI*2;
+        const r=vel*(Math.random()<0.5?0.5:1)*(0.8+Math.random()*0.4);
+        vx=Math.cos(a)*r; vy=Math.sin(a)*r;
+      } else if(this.type===2){ // ring (hollow)
+        const a=(i/count)*Math.PI*2;
+        const r=vel*(0.95+Math.random()*0.1);
+        vx=Math.cos(a)*r; vy=Math.sin(a)*r;
+      } else { // willow — droopy
+        const a=Math.random()*Math.PI*2;
+        const r=(2+Math.random()*vel);
+        vx=Math.cos(a)*r; vy=Math.sin(a)*r-2;
+      }
+      // add slight randomness
+      vx+=(Math.random()-0.5)*0.5;
+      vy+=(Math.random()-0.5)*0.5;
+      const life=55+Math.floor(Math.random()*50);
+      this.sparks.push(new Spark(this.x,this.y,vx,vy,this.color,life,[]));
+    }
+    // glitter sparks (gold shimmer)
+    if(Math.random()>0.5){
+      for(let i=0;i<30;i++){
+        const a=Math.random()*Math.PI*2;
+        const r=Math.random()*vel*1.2;
+        this.sparks.push(new Spark(this.x,this.y,Math.cos(a)*r,Math.sin(a)*r,'#fffaaa',40+Math.floor(Math.random()*30),[]));
+      }
+    }
+  }
+  draw(ctx) {
+    if(!this.exploded){
+      // rising trail
+      for(let i=0;i<this.trail.length;i++){
+        const a=(1-i/this.trail.length)*0.7;
+        ctx.globalAlpha=a;
+        ctx.beginPath();
+        ctx.arc(this.trail[i].x,this.trail[i].y,1.5*(1-i/this.trail.length),0,Math.PI*2);
+        ctx.fillStyle=this.color;
+        ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,2.5,0,Math.PI*2);
+      ctx.fillStyle='#ffffff';
+      ctx.fill();
+    } else {
+      this.sparks.forEach(s=>s.draw(ctx));
+    }
+  }
+  done(){ return this.exploded && this.sparks.length===0; }
+}
+
+let shells = [];
+let fwTimer = 0;
+
+// Side launch zones — left and right of center content
+function randomLaunchX() {
+  const isNarrow = fw.width < 500;
+  const sideW = isNarrow ? fw.width * 0.28 : fw.width * 0.22;
+  if(Math.random()<0.5) return Math.random() * sideW;
+  else return fw.width - Math.random() * sideW;
+}
+
+function randomTargetY() {
+  // Explode at 15%-55% height — clearly visible beside the cake on both desktop and mobile
+  return fw.height * 0.15 + Math.random() * fw.height * 0.40;
+}
+
+function animateFireworks() {
+  if(!fireworksActive) return;
+  fwCtx.globalCompositeOperation='source-over';
+  fwCtx.fillStyle='rgba(10,0,20,0.18)';
+  fwCtx.fillRect(0,0,fw.width,fw.height);
+
+  fwTimer++;
+  if(fwTimer % 28 === 0) {
+    shells.push(new Shell(randomLaunchX(), randomTargetY()));
+  }
+  // random burst of 2-3 at start
+  if(fwTimer===1){ for(let i=0;i<3;i++) shells.push(new Shell(randomLaunchX(),randomTargetY())); }
+
+  shells = shells.filter(s=>!s.done());
+  shells.forEach(s=>{ s.update(); s.draw(fwCtx); });
+
+  requestAnimationFrame(animateFireworks);
+}
+
+// ── MAIN INTERACTION ──
+const giftScreen     = document.getElementById('gift-screen');
+const birthdayScreen = document.getElementById('birthday-screen');
+const cake           = document.getElementById('cake');
+const message        = document.getElementById('message');
+const nameEl         = document.getElementById('name');
+const balloonWraps   = document.querySelectorAll('.b-wrap');
+
+function reveal() {
+  giftScreen.classList.add('fade-out');
+  setTimeout(() => {
+    birthdayScreen.classList.add('visible');
+    balloonWraps.forEach(w => w.classList.add('pop-in'));
+    setTimeout(()=> cake.classList.add('pop-in'), 800);
+    setTimeout(()=> message.classList.add('pop-in'), 1400);
+    setTimeout(()=> nameEl.classList.add('pop-in'), 1900);
+    fireworksActive = true;
+    animateFireworks();
+    setTimeout(()=> giftScreen.remove(), 1200);
+  }, 400);
+}
+
+let revealed = false;
+function safeReveal(e) {
+  if (revealed) return;
+  revealed = true;
+  if (e && e.cancelable) e.preventDefault();
+  reveal();
+}
+
+giftScreen.addEventListener('click',      safeReveal);
+giftScreen.addEventListener('touchstart', safeReveal, { passive: false });
+giftScreen.addEventListener('touchend',   safeReveal, { passive: false });
+giftScreen.addEventListener('pointerdown',safeReveal);
+
+// En móvil: cuenta regresiva y auto-reveal
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
+if (isMobile) {
+  let countdown = 3;
+  const hint = document.querySelector('.click-hint');
+  hint.textContent = `¡Toca! (${countdown})`;
+  const timer = setInterval(() => {
+    countdown--;
+    if (countdown > 0) {
+      hint.textContent = `¡Toca! (${countdown})`;
+    } else {
+      clearInterval(timer);
+      hint.textContent = '✨';
+      setTimeout(() => safeReveal(null), 400);
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>
