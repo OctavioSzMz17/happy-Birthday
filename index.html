@@ -222,7 +222,7 @@
     </div>
     <div class="cake" id="cake">🎂</div>
     <p class="message" id="message">Happy Birthday my Love</p>
-    <p class="name" id="name">MARIANA ❤️✨</p>
+    <p class="name" id="name">Valentina ✨</p>
   </div>
 </div>
 
@@ -478,22 +478,10 @@ giftScreen.addEventListener('touchstart', safeReveal, { passive: false });
 giftScreen.addEventListener('touchend',   safeReveal, { passive: false });
 giftScreen.addEventListener('pointerdown',safeReveal);
 
-// En móvil: cuenta regresiva y auto-reveal
+// En móvil: auto-reveal silencioso después de 10 segundos
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
 if (isMobile) {
-  let countdown = 3;
-  const hint = document.querySelector('.click-hint');
-  hint.textContent = `¡Toca! (${countdown})`;
-  const timer = setInterval(() => {
-    countdown--;
-    if (countdown > 0) {
-      hint.textContent = `¡Toca! (${countdown})`;
-    } else {
-      clearInterval(timer);
-      hint.textContent = '✨';
-      setTimeout(() => safeReveal(null), 400);
-    }
-  }, 1000);
+  setTimeout(() => safeReveal(null), 10000);
 }
 </script>
 </body>
